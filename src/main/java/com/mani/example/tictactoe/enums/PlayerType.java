@@ -1,4 +1,5 @@
-package com.mani.example.tictactoe;
+package com.mani.example.tictactoe.enums;
 
 public enum PlayerType {
+    HUMAN, BOT
 }
