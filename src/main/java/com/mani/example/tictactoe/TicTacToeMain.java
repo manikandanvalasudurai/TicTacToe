@@ -24,7 +24,7 @@ public class TicTacToeMain {
         GameController gameController = new GameController();
 
         List<Player> players = new ArrayList<>();
-        players.add(new Player("MKV",1L,new Symbol('X'), PlayerType.HUMAN));
+        players.add(new Player("Madhesh",1L,new Symbol('X'), PlayerType.HUMAN));
         players.add(new Bot("BOT",2L,new Symbol('O'), BotDifficultyLevel.EASY));
 
         Game game = gameController.startGame(3,players);
@@ -38,7 +38,8 @@ public class TicTacToeMain {
             System.out.println("Match Drawn");
         }
         else {
-            System.out.println(gameController.getWinner(game).getName() + "has won the game");
+            gameController.displayBoard(game);
+            System.out.println(gameController.getWinner(game).getName() + " has won the game");
         }
 
 

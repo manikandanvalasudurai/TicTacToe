@@ -50,7 +50,7 @@ public  class Player {
     public void setPlayerType(PlayerType playerType) {
         this.playerType = playerType;
     }
-    public Move makeMove() {
+    public Move makeMove(Board board) {
         System.out.println("Please enter row number where you want to place a move.");
         int row = scanner.nextInt();
         System.out.println("Please enter column number where you want to place a move.");

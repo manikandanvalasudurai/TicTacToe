@@ -6,6 +6,10 @@ import com.mani.example.tictactoe.enums.PlayerType;
 import com.mani.example.tictactoe.exceptions.BotCountException;
 import com.mani.example.tictactoe.exceptions.DuplicateSymbolFoundException;
 import com.mani.example.tictactoe.exceptions.InvalidPlayerCountException;
+import com.mani.example.tictactoe.strategy.gamewinningstrategy.ColWinningStrategy;
+import com.mani.example.tictactoe.strategy.gamewinningstrategy.DiagonalWinningStrategy;
+import com.mani.example.tictactoe.strategy.gamewinningstrategy.GameWinningStrategy;
+import com.mani.example.tictactoe.strategy.gamewinningstrategy.RowWinningStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +23,7 @@ public class Game {
     private Player winner;
     private int nextPlayerMoveIndex;
     private GameState gameState;
+    private List<GameWinningStrategy> winningStrategies;
 
     public GameState getGameState() {
         return gameState;
@@ -28,13 +33,14 @@ public class Game {
         this.gameState = gameState;
     }
 
-    private Game(int dimension, List<Player> players) {
+    private Game(int dimension, List<Player> players,List<GameWinningStrategy> winningStrategies) {
         this.board = new Board(dimension);
         this.players = players;
         this.moves = new ArrayList<>();
         this.winner = null;
         this.nextPlayerMoveIndex = 0;
         this.gameState =  GameState.INPROGRESS;
+        this.winningStrategies = winningStrategies;
     }
     private boolean validateMove(Move move,Board board) {
         int row =  move.getCell().getRow();
@@ -47,9 +53,9 @@ public class Game {
 
     public void makeMove() {
         Player currentPlayer = players.get(nextPlayerMoveIndex);
-        System.out.println("it's " + currentPlayer+" 's turn");
+        System.out.println("it's " + currentPlayer.getName()+" 's turn");
         //Ask currentPlayer to make a move
-        Move move = currentPlayer.makeMove();
+        Move move = currentPlayer.makeMove(board);
         //validate the move
         validateMove(move, board);
         //Placing move on the Board
@@ -62,6 +68,13 @@ public class Game {
         nextPlayerMoveIndex++;
         nextPlayerMoveIndex =  nextPlayerMoveIndex % players.size();
         //check the game state
+        if(checkWinner(board, finalMove)) {
+            gameState = GameState.ENDED;
+            winner = currentPlayer;
+        }
+        else if(moves.size() == board.getSize() * board.getSize()) {
+            gameState = GameState.DRAW;
+        }
     }
     public static Builder getBuilder() {
         return new Builder();
@@ -110,7 +123,15 @@ public class Game {
     public void displayBoard() {
         board.printBoard();
     }
-
+    private boolean checkWinner(Board board,Move move) {
+        //check all the game winning strategies to check the winner
+        for(GameWinningStrategy winningStrategy : winningStrategies) {
+            if(winningStrategy.checkWinner(board, move)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public static class Builder {
         //Not all Attributes required like conventional Builder
         //REASON is
@@ -180,7 +201,12 @@ public class Game {
             validateGame(dimention,players);
             return new Game(
                     dimention,
-                    players
+                    players,
+                    List.of(
+                            new RowWinningStrategy(),
+                            new ColWinningStrategy(),
+                            new DiagonalWinningStrategy()
+                    )
             );
         }
     }
