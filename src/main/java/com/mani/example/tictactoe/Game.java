@@ -1,5 +1,7 @@
 package com.mani.example.tictactoe;
 
+import com.mani.example.tictactoe.enums.CellState;
+import com.mani.example.tictactoe.enums.GameState;
 import com.mani.example.tictactoe.enums.PlayerType;
 import com.mani.example.tictactoe.exceptions.BotCountException;
 import com.mani.example.tictactoe.exceptions.DuplicateSymbolFoundException;
@@ -16,13 +18,50 @@ public class Game {
     private List<Move> moves;
     private Player winner;
     private int nextPlayerMoveIndex;
+    private GameState gameState;
 
-    private Game(int dimension,List<Player> players) {
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+    private Game(int dimension, List<Player> players) {
         this.board = new Board(dimension);
         this.players = players;
         this.moves = new ArrayList<>();
         this.winner = null;
         this.nextPlayerMoveIndex = 0;
+        this.gameState =  GameState.INPROGRESS;
+    }
+    private boolean validateMove(Move move,Board board) {
+        int row =  move.getCell().getRow();
+        int col =  move.getCell().getCol();
+
+        Cell cell = board.getBoard().get(row).get(col);
+
+        return row >=0 && row < board.getSize() && col >=0 && col < board.getSize() && cell.isEmpty();
+    }
+
+    public void makeMove() {
+        Player currentPlayer = players.get(nextPlayerMoveIndex);
+        System.out.println("it's " + currentPlayer+" 's turn");
+        //Ask currentPlayer to make a move
+        Move move = currentPlayer.makeMove();
+        //validate the move
+        validateMove(move, board);
+        //Placing move on the Board
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
+        Cell cell = board.getBoard().get(row).get(col);
+        cell.setPlayer(currentPlayer);
+        cell.setCellState(CellState.FILLED);
+        Move finalMove = new Move(currentPlayer, cell);
+        nextPlayerMoveIndex++;
+        nextPlayerMoveIndex =  nextPlayerMoveIndex % players.size();
+        //check the game state
     }
     public static Builder getBuilder() {
         return new Builder();

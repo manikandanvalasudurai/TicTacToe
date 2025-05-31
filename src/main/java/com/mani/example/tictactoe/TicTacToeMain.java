@@ -2,6 +2,7 @@ package com.mani.example.tictactoe;
 
 import com.mani.example.tictactoe.controllers.GameController;
 import com.mani.example.tictactoe.enums.BotDifficultyLevel;
+import com.mani.example.tictactoe.enums.GameState;
 import com.mani.example.tictactoe.enums.PlayerType;
 import com.mani.example.tictactoe.exceptions.BotCountException;
 import com.mani.example.tictactoe.exceptions.DuplicateSymbolFoundException;
@@ -27,7 +28,19 @@ public class TicTacToeMain {
         players.add(new Bot("BOT",2L,new Symbol('O'), BotDifficultyLevel.EASY));
 
         Game game = gameController.startGame(3,players);
+        while(gameController.getGameState(game).equals(GameState.INPROGRESS)){
+            gameController.displayBoard(game);
+            gameController.makeMove(game);
 
-        gameController.displayBoard(game);
+        }
+        //Either Draw / Ended
+        if(gameController.getGameState(game).equals(GameState.DRAW)){
+            System.out.println("Match Drawn");
+        }
+        else {
+            System.out.println(gameController.getWinner(game).getName() + "has won the game");
+        }
+
+
     }
 }
